@@ -7,7 +7,7 @@
 ## 시작하기
 
 ### 환경 설정
-1. 환경변수 설정.
+1. 환경변수 설정
 ```bash
 # .env 파일을 생성하고 아래 환경변수를 설정합니다
 REACT_APP_MEMBER_URL=http://localhost:8081
