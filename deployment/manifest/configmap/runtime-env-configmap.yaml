@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runtime-env-config
+data:
+  runtime-env.js: |
+    window.__runtime_config__ = {
+      AUTH_URL: 'https://dg0301.20.214.196.128.nip.io/api/auth',
+      CONTENT_URL: 'https://dg0301.20.214.196.128.nip.io/api/mysub',
+      TOKEN_URL: 'https://dg0301.20.214.196.128.nip.io/api/recommend'
+    }
