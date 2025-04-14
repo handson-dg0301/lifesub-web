@@ -1,0 +1,74 @@
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runtime-env-config
+  namespace: ${namespace}
+data:
+  runtime-env.js: |
+    window.__runtime_config__ = {
+      MEMBER_URL: 'http://dg0301.20.214.196.128.nip.io/api/auth',
+      MYSUB_URL: 'http://dg0301.20.214.196.128.nip.io/api/mysub',
+      RECOMMEND_URL: 'http://dg0301.20.214.196.128.nip.io/api/recommend'
+    }
+
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lifesub-web
+  namespace: ${namespace}
+  labels:
+    app: lifesub-web
+spec:
+  replicas: ${replicas}
+  selector:
+    matchLabels:
+      app: lifesub-web
+  template:
+    metadata:
+      labels:
+        app: lifesub-web
+    spec:
+      containers:
+      - name: lifesub-web
+        image: ${lifesub_web_image_path}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: ${export_port}
+        resources:
+          requests:
+            cpu: ${resources_requests_cpu}
+            memory: ${resources_requests_memory}
+          limits:
+            cpu: ${resources_limits_cpu}
+            memory: ${resources_limits_memory}
+        volumeMounts:
+        - name: runtime-env
+          mountPath: /usr/share/nginx/html/runtime-env.js
+          subPath: runtime-env.js
+      volumes:
+      - name: runtime-env
+        configMap:
+          name: runtime-env-config
+      imagePullSecrets:
+      - name: acr-auth
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: lifesub-web
+  namespace: ${namespace}
+  labels:
+    app: lifesub-web
+spec:
+  selector:
+    app: lifesub-web
+  ports:
+  - port: 80
+    targetPort: ${export_port}
+    protocol: TCP
+  type: LoadBalancer
